@@ -6,7 +6,7 @@ const AllDresses = () => {
   const API = import.meta.env.VITE_API_URL
   useEffect(() => {
     axios
-      .get(`${API}/dress/`)
+      .get(`${API}/api/v1/dress/`)
       .then((res) => setDresses(res.data.data));
   }, []);
 

@@ -16,7 +16,7 @@ const CollectionSection = () => {
   useEffect(() => {
     const fetchDresses = async () => {
       try {
-        const res = await axios.get(`${API}/dress/`);
+        const res = await axios.get(`${API}/api/v1/dress/`);
 
         setDresses(res.data.data || []);
       } catch (error) {

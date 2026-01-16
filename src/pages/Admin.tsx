@@ -52,7 +52,7 @@ const AdminPage = () => {
   /* ================= FETCH DRESSES ================= */
   const fetchDresses = async () => {
     try {
-      const res = await axios.get(`${API}/dress/`);
+      const res = await axios.get(`${API}/api/v1/dress/`);
       console.log(res)
       setDresses(res.data.data);
     } catch {
@@ -80,7 +80,7 @@ const AdminPage = () => {
       formData.append("withoutJewelryPrice", dressForm.withoutJewelryPrice);
       dressForm.images.forEach((img) => formData.append("images", img));
 
-      await axios.post(`${API}/dress/upload-dress`, formData);
+      await axios.post(`${API}/api/v1/dress/upload-dress`, formData);
 
       toast.success("Dress added successfully");
       setIsAddDressOpen(false);
@@ -100,7 +100,7 @@ const AdminPage = () => {
   /* ================= ADD RENTAL ================= */
   const handleAddRental = async () => {
     try {
-      await axios.post(`${API}/dress/rentals`, {
+      await axios.post(`${API}/api/v1/dress/rentals`, {
         dressId: selectedDress._id,
         ...rentalForm,
       });
