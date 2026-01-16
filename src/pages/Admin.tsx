@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.jpeg";
 
-const API = process.env.VITE_API_URL||"http://localhost:3000/api/v1";
+const API = import.meta.env.VITE_API_URL||"http://localhost:3000/api/v1";
 
 const AdminPage = () => {
   const [dresses, setDresses] = useState([]);

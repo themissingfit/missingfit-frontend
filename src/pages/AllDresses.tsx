@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AllDresses = () => {
   const [dresses, setDresses] = useState([]);
-  const API = process.env.VITE_API_URL
+  const API = import.meta.env.VITE_API_URL
   useEffect(() => {
     axios
       .get(`${API}/dress/`)

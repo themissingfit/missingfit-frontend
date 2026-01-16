@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import DressCard from "./DressCard";
 import DressDetailModal from "./DressDetailModal";
 import axios from "axios";
+import { log } from "console";
 
 
 const CollectionSection = () => {
@@ -10,12 +11,13 @@ const CollectionSection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedDress, setSelectedDress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const API = process.env.VITE_API_URL || "http://localhost:3000/api/v1"
+  const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"
   /* ================= FETCH DRESSES ================= */
   useEffect(() => {
     const fetchDresses = async () => {
       try {
         const res = await axios.get(`${API}/dress/`);
+
         setDresses(res.data.data || []);
       } catch (error) {
         console.error("Failed to fetch dresses", error);
