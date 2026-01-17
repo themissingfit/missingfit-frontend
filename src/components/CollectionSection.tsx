@@ -3,21 +3,22 @@ import { Button } from "@/components/ui/button";
 import DressCard from "./DressCard";
 import DressDetailModal from "./DressDetailModal";
 import axios from "axios";
-import { log } from "console";
-
+import { useNavigate } from "react-router-dom";
 
 const CollectionSection = () => {
   const [dresses, setDresses] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedDress, setSelectedDress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1"
+
+  const navigate = useNavigate();
+  const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+
   /* ================= FETCH DRESSES ================= */
   useEffect(() => {
     const fetchDresses = async () => {
       try {
-        const res = await axios.get(`${API}/api/v1/dress/`);
-
+        const res = await axios.get(`${API}/dress`);
         setDresses(res.data.data || []);
       } catch (error) {
         console.error("Failed to fetch dresses", error);
@@ -27,24 +28,15 @@ const CollectionSection = () => {
     };
 
     fetchDresses();
-  }, []);
+  }, [API]);
 
-  /* ================= DYNAMIC CATEGORIES ================= */
+  /* ================= CATEGORIES ================= */
   const categories = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(dresses.map((d) => d.category))
-    );
-
-    return [
-      { id: "all", name: "All" },
-      ...uniqueCategories.map((cat) => ({
-        id: cat,
-        name: cat,
-      })),
-    ];
+    const unique = [...new Set(dresses.map((d) => d.category))];
+    return [{ id: "all", name: "All" }, ...unique.map((c) => ({ id: c, name: c }))];
   }, [dresses]);
 
-  /* ================= FILTERED DRESSES ================= */
+  /* ================= FILTER ================= */
   const filteredDresses =
     activeCategory === "all"
       ? dresses
@@ -59,27 +51,25 @@ const CollectionSection = () => {
   }
 
   return (
-    <section id="collection" className="py-20 bg-background">
+    <section id="collection" className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-foreground mb-4">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h2 className="font-display text-3xl md:text-4xl text-foreground mb-3">
             Our <span className="text-gradient-gold">Curated Collection</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            From timeless traditional wear to contemporary Indo-western pieces,
-            discover outfits that make every moment memorable.
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm md:text-base">
+            Discover outfits that make every moment memorable.
           </p>
-          <div className="section-divider mt-6" />
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {/* Categories */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
           {categories.map((category) => (
             <Button
               key={category.id}
-              variant={activeCategory === category.id ? "gold" : "outline"}
               size="sm"
+              variant={activeCategory === category.id ? "gold" : "outline"}
               onClick={() => setActiveCategory(category.id)}
             >
               {category.name}
@@ -87,8 +77,8 @@ const CollectionSection = () => {
           ))}
         </div>
 
-        {/* Dress Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Grid */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredDresses.map((dress) => (
             <DressCard
               key={dress._id}
@@ -98,7 +88,7 @@ const CollectionSection = () => {
           ))}
         </div>
 
-        {/* Empty State */}
+        {/* Empty */}
         {filteredDresses.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
@@ -107,7 +97,18 @@ const CollectionSection = () => {
           </div>
         )}
 
-        {/* Dress Detail Modal */}
+        {/* Explore More Button */}
+        <div className="flex justify-center mt-12">
+          <Button
+            size="lg"
+            variant="gold"
+            onClick={() => navigate("/dresses")}
+          >
+            Explore More
+          </Button>
+        </div>
+
+        {/* Modal */}
         <DressDetailModal
           dress={selectedDress}
           isOpen={!!selectedDress}

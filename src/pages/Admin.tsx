@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -15,7 +14,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,22 +23,22 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.jpeg";
 
-const API = import.meta.env.VITE_API_URL||"http://localhost:3000/api/v1";
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
-const AdminPage = () => {
-  const [dresses, setDresses] = useState([]);
+const Admin = () => {
+  const [dresses, setDresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [isAddDressOpen, setIsAddDressOpen] = useState(false);
-  const [isRentalOpen, setIsRentalOpen] = useState(false);
-  const [selectedDress, setSelectedDress] = useState(null);
+  const [addDressOpen, setAddDressOpen] = useState(false);
+  const [rentalOpen, setRentalOpen] = useState(false);
+  const [selectedDress, setSelectedDress] = useState<any>(null);
 
   const [dressForm, setDressForm] = useState({
     dressTitle: "",
     category: "",
     withJewelryPrice: "",
     withoutJewelryPrice: "",
-    images: [],
+    images: [] as File[],
   });
 
   const [rentalForm, setRentalForm] = useState({
@@ -49,12 +47,11 @@ const AdminPage = () => {
     customerName: "",
   });
 
-  /* ================= FETCH DRESSES ================= */
+  /* ================= FETCH ================= */
   const fetchDresses = async () => {
     try {
-      const res = await axios.get(`${API}/api/v1/dress/`);
-      console.log(res)
-      setDresses(res.data.data);
+      const res = await axios.get(`${API}/dress`);
+      setDresses(res.data.data || []);
     } catch {
       toast.error("Failed to load dresses");
     } finally {
@@ -66,58 +63,67 @@ const AdminPage = () => {
     fetchDresses();
   }, []);
 
+  /* ================= ADD DRESS ================= */
   const handleAddDress = async () => {
-    try {
-      if (!dressForm.dressTitle || dressForm.images.length === 0) {
-        toast.error("Title & images are required");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("dressTitle", dressForm.dressTitle);
-      formData.append("category", dressForm.category);
-      formData.append("withJewelryPrice", dressForm.withJewelryPrice);
-      formData.append("withoutJewelryPrice", dressForm.withoutJewelryPrice);
-      dressForm.images.forEach((img) => formData.append("images", img));
-
-      await axios.post(`${API}/api/v1/dress/upload-dress`, formData);
-
-      toast.success("Dress added successfully");
-      setIsAddDressOpen(false);
-      setDressForm({
-        dressTitle: "",
-        category: "",
-        withJewelryPrice: "",
-        withoutJewelryPrice: "",
-        images: [],
-      });
-      fetchDresses();
-    } catch {
-      toast.error("Failed to add dress");
+  try {
+    if (!dressForm.dressTitle || dressForm.images.length === 0) {
+      toast.error("Title and images required");
+      return;
     }
-  };
+
+    const formData = new FormData();
+
+    formData.append("dressTitle", dressForm.dressTitle);
+    formData.append("category", dressForm.category);
+    formData.append("withJewelryPrice", dressForm.withJewelryPrice);
+    formData.append("withoutJewelryPrice", dressForm.withoutJewelryPrice);
+
+    // ✅ SAFE: images is File[]
+    dressForm.images.forEach((img: File) => {
+      formData.append("images", img);
+    });
+
+    await axios.post(`${API}/dress/upload-dress`, formData);
+
+    toast.success("Dress added");
+    setAddDressOpen(false);
+
+    setDressForm({
+      dressTitle: "",
+      category: "",
+      withJewelryPrice: "",
+      withoutJewelryPrice: "",
+      images: [],
+    });
+
+    fetchDresses();
+  } catch {
+    toast.error("Failed to add dress");
+  }
+};
+
 
   /* ================= ADD RENTAL ================= */
   const handleAddRental = async () => {
     try {
-      await axios.post(`${API}/api/v1/dress/rentals`, {
+      await axios.post(`${API}/dress/rentals`, {
         dressId: selectedDress._id,
         ...rentalForm,
       });
 
       toast.success("Rental added");
-      setIsRentalOpen(false);
+      setRentalOpen(false);
       setRentalForm({ startDate: "", endDate: "", customerName: "" });
       fetchDresses();
     } catch {
-      toast.error("Rental conflict or failed");
+      toast.error("Rental failed");
     }
   };
 
-  /* ================= DELETE RENTAL ================= */
-  const handleDeleteRental = async (rentalId) => {
+  /* ================= REMOVE RENTAL ================= */
+  const handleRemoveRental = async (dressId: string) => {
     try {
-      await axios.delete(`${API}/rentals/${rentalId}`);
+      await axios.delete(`${API}/dress/${dressId}/rental`);
       toast.success("Rental removed");
       fetchDresses();
     } catch {
@@ -132,11 +138,11 @@ const AdminPage = () => {
       {/* HEADER */}
       <header className="bg-primary text-cream sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <img src={logo} className="h-12 w-12 rounded-full" />
             <div>
               <h1 className="font-display text-xl">Admin Dashboard</h1>
-              <p className="text-cream/60 text-sm">Manage inventory</p>
+              <p className="text-cream/60 text-sm">Manage rentals & inventory</p>
             </div>
           </div>
           <Link to="/">
@@ -152,8 +158,7 @@ const AdminPage = () => {
         <div className="flex justify-between mb-6">
           <h2 className="font-display text-2xl">Dress Inventory</h2>
 
-          {/* ADD DRESS */}
-          <Dialog open={isAddDressOpen} onOpenChange={setIsAddDressOpen}>
+          <Dialog open={addDressOpen} onOpenChange={setAddDressOpen}>
             <DialogTrigger asChild>
               <Button variant="gold">
                 <Plus className="h-4 w-4" /> Add Dress
@@ -161,8 +166,7 @@ const AdminPage = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Dress</DialogTitle>
-                <DialogDescription>Add outfit to inventory</DialogDescription>
+                <DialogTitle>Add Dress</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-3">
@@ -182,7 +186,7 @@ const AdminPage = () => {
                 />
                 <Input
                   type="number"
-                  placeholder="Price with jewelry"
+                  placeholder="With jewelry price"
                   onChange={(e) =>
                     setDressForm({
                       ...dressForm,
@@ -192,7 +196,7 @@ const AdminPage = () => {
                 />
                 <Input
                   type="number"
-                  placeholder="Price without jewelry"
+                  placeholder="Without jewelry price"
                   onChange={(e) =>
                     setDressForm({
                       ...dressForm,
@@ -206,7 +210,7 @@ const AdminPage = () => {
                   onChange={(e) =>
                     setDressForm({
                       ...dressForm,
-                      images: Array.from(e.target.files),
+                      images: Array.from(e.target.files || []),
                     })
                   }
                 />
@@ -230,58 +234,77 @@ const AdminPage = () => {
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {dresses.map((dress) => (
               <TableRow key={dress._id}>
                 <TableCell>
                   <img
-                    src={dress.images[0]?.url}
+                    src={dress.images?.[0]?.url}
                     className="w-16 h-20 rounded object-cover"
                   />
                 </TableCell>
+
                 <TableCell>
                   <p className="font-medium">{dress.dressTitle}</p>
-                  <p className="text-sm">₹{dress.withJewelryPrice}</p>
+                  <p className="text-sm">
+                    ₹{dress.withJewelryPrice} with jewelry
+                  </p>
                 </TableCell>
+
                 <TableCell>
                   <Badge
                     className={
                       dress.status === "Available"
-                        ? "bg-accent"
+                        ? "bg-accent text-primary"
                         : "bg-burgundy text-cream"
                     }
                   >
                     {dress.status}
                   </Badge>
                 </TableCell>
+
                 <TableCell>
                   {dress.currentRental ? (
-                    <div className="flex gap-2 text-sm items-center">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(dress.currentRental.startDate).toDateString()}
-                      -
-                      {new Date(dress.currentRental.endDate).toDateString()}
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(
+                          dress.currentRental.startDate
+                        ).toDateString()}{" "}
+                        -{" "}
+                        {new Date(
+                          dress.currentRental.endDate
+                        ).toDateString()}
+                      </div>
+                      <p className="text-muted-foreground">
+                        Rented by{" "}
+                        <strong>
+                          {dress.currentRental.customerName || "Guest"}
+                        </strong>
+                      </p>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
-                          handleDeleteRental(dress.currentRental._id)
-                        }
+                        onClick={() => handleRemoveRental(dress._id)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   ) : (
-                    "No active rental"
+                    <span className="text-muted-foreground">
+                      No active rental
+                    </span>
                   )}
                 </TableCell>
+
                 <TableCell className="text-right">
                   <Button
                     variant="gold"
                     size="sm"
                     onClick={() => {
                       setSelectedDress(dress);
-                      setIsRentalOpen(true);
+                      setRentalOpen(true);
                     }}
                   >
                     Add Rental
@@ -293,12 +316,13 @@ const AdminPage = () => {
         </Table>
       </main>
 
-      {/* RENTAL DIALOG */}
-      <Dialog open={isRentalOpen} onOpenChange={setIsRentalOpen}>
+      {/* RENTAL MODAL */}
+      <Dialog open={rentalOpen} onOpenChange={setRentalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Rental</DialogTitle>
           </DialogHeader>
+
           <div className="space-y-3">
             <Input
               type="date"
@@ -313,7 +337,7 @@ const AdminPage = () => {
               }
             />
             <Input
-              placeholder="Customer Name"
+              placeholder="Customer name"
               onChange={(e) =>
                 setRentalForm({
                   ...rentalForm,
@@ -331,4 +355,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default Admin;

@@ -22,7 +22,7 @@ const AdminProtectedRoute = ({ children }) => {
   }, []);
 
   if (loading) return <div className="p-10">Checking access…</div>;
-  if (!allowed) return <Navigate to="/" replace />;
+  if (!allowed) return <Navigate to="/login" replace />;
 
   return children;
 };
