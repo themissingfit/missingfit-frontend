@@ -9,7 +9,8 @@ const AdminProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await api.get("/api/v1/user/me"); // ✅ if this works, user is logged in
+        // ✅ REMOVE /api/v1 here
+        await api.get("/user/me");
         setAllowed(true);
       } catch (err) {
         setAllowed(false);
