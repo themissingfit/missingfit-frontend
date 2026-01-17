@@ -10,7 +10,7 @@ const AdminProtectedRoute = ({ children }) => {
     const checkAuth = async () => {
       try {
         // ✅ REMOVE /api/v1 here
-        await api.get("/user/me");
+        await api.get("api/v1/user/me");
         setAllowed(true);
       } catch (err) {
         setAllowed(false);
