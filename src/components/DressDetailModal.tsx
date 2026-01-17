@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Phone, Calendar } from "lucide-react";
 
-// 🔥 Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -21,7 +20,7 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
   const isAvailable = dress.status === "Available";
 
   const handleWhatsApp = () => {
-    const message = `Hi! I'm interested in renting the "${dress.dressTitle}" from The Missing Fit. Can you help me with the booking?`;
+    const message = `Hi! I'm interested in renting the "${dress.dressTitle}" from The Missing Fit.`;
     window.open(
       `https://wa.me/917225994009?text=${encodeURIComponent(message)}`,
       "_blank"
@@ -30,14 +29,14 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">
+          <DialogTitle className="font-display text-xl sm:text-2xl">
             {dress.dressTitle}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid md:grid-cols-2 gap-8 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {/* IMAGE SLIDER */}
           <div className="relative">
             <Swiper
@@ -48,7 +47,7 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
             >
               {dress.images?.map((img, index) => (
                 <SwiperSlide key={index}>
-                  <div className="aspect-[3/4]">
+                  <div className="aspect-[3/4] max-h-[70vh] sm:max-h-none">
                     <img
                       src={img.url}
                       alt={`${dress.dressTitle} ${index + 1}`}
@@ -60,7 +59,7 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
             </Swiper>
 
             {/* BADGES */}
-            <div className="absolute top-4 left-4 z-10 flex gap-2">
+            <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-2">
               <Badge
                 className={
                   isAvailable
@@ -68,7 +67,7 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
                     : "bg-burgundy text-cream"
                 }
               >
-                {isAvailable ? "Available Now" : "Currently Rented"}
+                {isAvailable ? "Available" : "Rented"}
               </Badge>
 
               <Badge
@@ -81,40 +80,32 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
           </div>
 
           {/* DETAILS */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* PRICING */}
-            <div className="bg-secondary/50 rounded-xl p-5 space-y-4">
-              <h4 className="font-display text-lg text-foreground">
-                Rental Pricing
-              </h4>
+            <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
+              <h4 className="font-display text-lg">Rental Pricing</h4>
 
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Outfit Only</span>
-                  <span className="text-xl font-semibold text-foreground">
-                    ₹{dress.withoutJewelryPrice?.toLocaleString()}
-                  </span>
-                </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Outfit Only</span>
+                <span className="font-semibold">
+                  ₹{dress.withoutJewelryPrice?.toLocaleString()}
+                </span>
+              </div>
 
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">
-                    With Matching Jewelry
-                  </span>
-                  <span className="text-xl font-semibold text-accent">
-                    ₹{dress.withJewelryPrice?.toLocaleString()}
-                  </span>
-                </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">With Jewelry</span>
+                <span className="font-semibold text-accent">
+                  ₹{dress.withJewelryPrice?.toLocaleString()}
+                </span>
               </div>
             </div>
 
             {/* RENTAL STATUS */}
             {!isAvailable && dress.currentRental && (
-              <div className="bg-burgundy/10 rounded-xl p-4 flex items-start gap-3">
-                <Calendar className="h-5 w-5 text-burgundy mt-0.5" />
+              <div className="bg-burgundy/10 rounded-xl p-4 flex gap-3">
+                <Calendar className="h-5 w-5 text-burgundy mt-1" />
                 <div>
-                  <p className="font-medium text-foreground">
-                    Currently Rented
-                  </p>
+                  <p className="font-medium">Currently Rented</p>
                   <p className="text-sm text-muted-foreground">
                     Available after{" "}
                     {new Date(
@@ -129,12 +120,11 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
               </div>
             )}
 
-            {/* ACTION BUTTONS */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            {/* ACTIONS */}
+            <div className="flex flex-col gap-3 pt-2">
               <Button
                 variant="whatsapp"
                 size="lg"
-                className="flex-1"
                 onClick={handleWhatsApp}
               >
                 <MessageCircle className="h-5 w-5" />
@@ -144,7 +134,6 @@ const DressDetailModal = ({ dress, isOpen, onClose }) => {
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1"
                 onClick={() =>
                   (window.location.href = "tel:+917225994009")
                 }

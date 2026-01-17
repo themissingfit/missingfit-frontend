@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import DressCard from "./DressCard";
 import DressDetailModal from "./DressDetailModal";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const CollectionSection = () => {
   const [dresses, setDresses] = useState([]);
@@ -12,6 +12,8 @@ const CollectionSection = () => {
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
   const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
   /* ================= FETCH DRESSES ================= */
@@ -32,8 +34,14 @@ const CollectionSection = () => {
 
   /* ================= CATEGORIES ================= */
   const categories = useMemo(() => {
-    const unique = [...new Set(dresses.map((d) => d.category))];
-    return [{ id: "all", name: "All" }, ...unique.map((c) => ({ id: c, name: c }))];
+    const uniqueCategories = Array.from(
+      new Set(dresses.map((d) => d.category))
+    );
+
+    return [
+      { id: "all", name: "All" },
+      ...uniqueCategories.map((c) => ({ id: c, name: c })),
+    ];
   }, [dresses]);
 
   /* ================= FILTER ================= */
@@ -42,10 +50,11 @@ const CollectionSection = () => {
       ? dresses
       : dresses.filter((d) => d.category === activeCategory);
 
+  /* ================= LOADING ================= */
   if (loading) {
     return (
       <section className="py-20 text-center">
-        <p className="text-muted-foreground">Loading collection...</p>
+        <p className="text-muted-foreground">Loading collection…</p>
       </section>
     );
   }
@@ -53,7 +62,7 @@ const CollectionSection = () => {
   return (
     <section id="collection" className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        {/* Header */}
+        {/* HEADER */}
         <div className="text-center mb-10">
           <h2 className="font-display text-3xl md:text-4xl text-foreground mb-3">
             Our <span className="text-gradient-gold">Curated Collection</span>
@@ -63,7 +72,7 @@ const CollectionSection = () => {
           </p>
         </div>
 
-        {/* Categories */}
+        {/* CATEGORIES */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
           {categories.map((category) => (
             <Button
@@ -77,7 +86,7 @@ const CollectionSection = () => {
           ))}
         </div>
 
-        {/* Grid */}
+        {/* GRID */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredDresses.map((dress) => (
             <DressCard
@@ -88,7 +97,7 @@ const CollectionSection = () => {
           ))}
         </div>
 
-        {/* Empty */}
+        {/* EMPTY STATE */}
         {filteredDresses.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
@@ -97,18 +106,20 @@ const CollectionSection = () => {
           </div>
         )}
 
-        {/* Explore More Button */}
-        <div className="flex justify-center mt-12">
-          <Button
-            size="lg"
-            variant="gold"
-            onClick={() => navigate("/dresses")}
-          >
-            Explore More
-          </Button>
-        </div>
+        {/* EXPLORE MORE (only on homepage) */}
+        {location.pathname !== "/dresses" && (
+          <div className="flex justify-center mt-12">
+            <Button
+              size="lg"
+              variant="gold"
+              onClick={() => navigate("/dresses")}
+            >
+              Explore More
+            </Button>
+          </div>
+        )}
 
-        {/* Modal */}
+        {/* MODAL */}
         <DressDetailModal
           dress={selectedDress}
           isOpen={!!selectedDress}

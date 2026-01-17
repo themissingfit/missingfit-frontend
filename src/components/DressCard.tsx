@@ -15,7 +15,7 @@ const DressCard = ({ dress, onViewDetails }) => {
 
   return (
     <div className="group card-elegant overflow-hidden transition-all duration-300 hover:shadow-lg">
-      {/* Image */}
+      {/* IMAGE */}
       <div className="relative aspect-[2/3] overflow-hidden">
         <img
           src={dress.images?.[0]?.url || "/placeholder-dress.jpg"}
@@ -46,8 +46,8 @@ const DressCard = ({ dress, onViewDetails }) => {
           </Badge>
         </div>
 
-        {/* Hover actions */}
-        <div className="absolute inset-0 bg-gradient-to-t from-chocolate/90 via-chocolate/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+        {/* DESKTOP HOVER ACTIONS */}
+        <div className="hidden sm:flex absolute inset-0 bg-gradient-to-t from-chocolate/90 via-chocolate/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-end p-3">
           <div className="w-full flex gap-2">
             <Button
               variant="hero"
@@ -68,14 +68,14 @@ const DressCard = ({ dress, onViewDetails }) => {
         </div>
       </div>
 
-      {/* Content */}
+      {/* CONTENT */}
       <div className="p-4">
-        <h3 className="font-display text-base font-semibold text-foreground mb-2 line-clamp-1">
+        <h3 className="font-display text-sm sm:text-base font-semibold mb-2 line-clamp-1">
           {dress.dressTitle}
         </h3>
 
         {/* Pricing */}
-        <div className="space-y-1 text-sm mb-3">
+        <div className="space-y-1 text-xs sm:text-sm mb-3">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Without Jewelry</span>
             <span className="font-medium">
@@ -91,7 +91,7 @@ const DressCard = ({ dress, onViewDetails }) => {
           </div>
         </div>
 
-        {/* Rental info */}
+        {/* RENTAL INFO */}
         {!isAvailable && dress.currentRental && (
           <div className="mt-2 p-2 bg-secondary/60 rounded-lg flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -106,6 +106,25 @@ const DressCard = ({ dress, onViewDetails }) => {
             </span>
           </div>
         )}
+
+        {/* MOBILE ACTION BUTTONS */}
+        <div className="mt-3 flex gap-2 sm:hidden">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => onViewDetails(dress)}
+          >
+            View Details
+          </Button>
+          <Button
+            variant="whatsapp"
+            size="sm"
+            onClick={handleWhatsApp}
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
