@@ -50,7 +50,7 @@ const Admin = () => {
   /* ================= FETCH ================= */
   const fetchDresses = async () => {
     try {
-      const res = await axios.get(`${API}/dress`);
+      const res = await axios.get(`${API}/api/v1/dress`);
       setDresses(res.data.data || []);
     } catch {
       toast.error("Failed to load dresses");
@@ -83,7 +83,7 @@ const Admin = () => {
       formData.append("images", img);
     });
 
-    await axios.post(`${API}/dress/upload-dress`, formData);
+    await axios.post(`${API}/api/v1/dress/upload-dress`, formData);
 
     toast.success("Dress added");
     setAddDressOpen(false);
@@ -106,7 +106,7 @@ const Admin = () => {
   /* ================= ADD RENTAL ================= */
   const handleAddRental = async () => {
     try {
-      await axios.post(`${API}/dress/rentals`, {
+      await axios.post(`${API}/api/v1/dress/rentals`, {
         dressId: selectedDress._id,
         ...rentalForm,
       });
@@ -123,7 +123,7 @@ const Admin = () => {
   /* ================= REMOVE RENTAL ================= */
   const handleRemoveRental = async (dressId: string) => {
     try {
-      await axios.delete(`${API}/dress/${dressId}/rental`);
+      await axios.delete(`${API}/api/v1/dress/${dressId}/rental`);
       toast.success("Rental removed");
       fetchDresses();
     } catch {

@@ -11,7 +11,7 @@ const AllDresses = () => {
 
   useEffect(() => {
     axios
-      .get(`${API}/dress`)
+      .get(`${API}/api/v1/dress`)
       .then((res) => setDresses(res.data.data || []))
       .finally(() => setLoading(false));
   }, [API]);

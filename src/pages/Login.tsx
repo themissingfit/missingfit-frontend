@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await api.post("/user/login", form); // ✅ axios instance
+      await api.post("/api/v1/user/login", form); // ✅ axios instance
 
       toast.success("Welcome Admin 👋");
       navigate("/admin");
